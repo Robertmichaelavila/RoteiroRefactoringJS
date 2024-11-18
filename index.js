@@ -1,8 +1,8 @@
 const { readFileSync } = require('fs');
-const ServicoCalculoFatura = require("./service");
 
-const pecas = JSON.parse(readFileSync('./pecas.json'));
-const calc = new ServicoCalculoFatura(pecas);
+const ServicoCalculoFatura = require("./service");
+const Repositorio = require("./repositorio.js");
+const calc = new ServicoCalculoFatura(new Repositorio());
 
 function formatarMoeda(valor) {
     return new Intl.NumberFormat("pt-BR", {
@@ -16,7 +16,7 @@ function gerarFaturaStr(fatura) {
     let faturaStr = `Fatura ${fatura.cliente}\n`;
 
     for (let apre of fatura.apresentacoes) {
-        faturaStr += `  ${calc.getPeca(apre).nome}: ${formatarMoeda(calc.calcularTotalApresentacao(apre))} (${apre.audiencia} assentos)\n`;
+        faturaStr += `  ${calc.repo.getPeca(apre).nome}: ${formatarMoeda(calc.calcularTotalApresentacao(apre))} (${apre.audiencia} assentos)\n`;
     }
 
     faturaStr += `Valor total: ${formatarMoeda(calc.calcularTotalFatura(fatura.apresentacoes))}\n`;
@@ -33,7 +33,7 @@ function gerarFaturaHTML(fatura) {
 
     for (let apre of fatura.apresentacoes) {
         faturaHtml += `
-        <li> ${calc.getPeca(apre).nome}: ${formatarMoeda(calc.calcularTotalApresentacao(apre))} (${apre.audiencia} assentos) </li>`;
+        <li> ${calc.repo.getPeca(apre).nome}: ${formatarMoeda(calc.calcularTotalApresentacao(apre))} (${apre.audiencia} assentos) </li>`;
     }
 
     faturaHtml += `

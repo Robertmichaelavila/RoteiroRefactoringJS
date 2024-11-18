@@ -1,15 +1,11 @@
 module.exports = class ServicoCalculoFatura {
-    constructor(pecas) {
-        this.pecas = pecas;
-    }
-
-    getPeca(apresentacao) {
-        return this.pecas[apresentacao.id];
+    constructor(repo) {
+        this.repo = repo;
     }
 
     calcularTotalApresentacao(apre) {
         let total = 0;
-        switch (this.getPeca(apre).tipo) {
+        switch (this.repo.getPeca(apre).tipo) {
           case "tragedia":
             total = 40000;
             if (apre.audiencia > 30) {
@@ -26,7 +22,7 @@ module.exports = class ServicoCalculoFatura {
 
             break;
           default:
-              throw new Error(`Peça desconhecida: ${this.getPeca(apre).tipo}`);
+              throw new Error(`Peça desconhecida: ${this.repo.getPeca(apre).tipo}`);
         }
 
         return total;
@@ -35,7 +31,7 @@ module.exports = class ServicoCalculoFatura {
     calcularCredito(apre) {
         let creditos = 0;
         creditos += Math.max(apre.audiencia - 30, 0);
-        if (this.getPeca(apre).tipo === "comedia") 
+        if (this.repo.getPeca(apre).tipo === "comedia") 
            creditos += Math.floor(apre.audiencia / 5);
 
         return creditos;   
