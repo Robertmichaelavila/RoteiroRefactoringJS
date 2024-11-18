@@ -2,53 +2,12 @@ const { readFileSync } = require('fs');
 
 const ServicoCalculoFatura = require("./service");
 const Repositorio = require("./repositorio.js");
+const { gerarFaturaStr, gerarFaturaHTML } = require("./apresentacoes.js");
 const calc = new ServicoCalculoFatura(new Repositorio());
 
-function formatarMoeda(valor) {
-    return new Intl.NumberFormat("pt-BR", {
-        style: "currency",
-        currency: "BRL",
-        minimumFractionDigits: 2
-    }).format(valor / 100);
-}
-
-function gerarFaturaStr(fatura) {
-    let faturaStr = `Fatura ${fatura.cliente}\n`;
-
-    for (let apre of fatura.apresentacoes) {
-        faturaStr += `  ${calc.repo.getPeca(apre).nome}: ${formatarMoeda(calc.calcularTotalApresentacao(apre))} (${apre.audiencia} assentos)\n`;
-    }
-
-    faturaStr += `Valor total: ${formatarMoeda(calc.calcularTotalFatura(fatura.apresentacoes))}\n`;
-    faturaStr += `Créditos acumulados: ${calc.calcularTotalCreditos(fatura.apresentacoes)} \n`;
-
-    return faturaStr;
-}
-
-function gerarFaturaHTML(fatura) {
-    let faturaHtml = `
-    <html>
-      <p> Fatura ${fatura.cliente} </p>
-      <ul>`;
-
-    for (let apre of fatura.apresentacoes) {
-        faturaHtml += `
-        <li> ${calc.repo.getPeca(apre).nome}: ${formatarMoeda(calc.calcularTotalApresentacao(apre))} (${apre.audiencia} assentos) </li>`;
-    }
-
-    faturaHtml += `
-      </ul>
-      <p> Valor total: ${formatarMoeda(calc.calcularTotalFatura(fatura.apresentacoes))} </p>
-      <p> Créditos acumulados: ${calc.calcularTotalCreditos(fatura.apresentacoes)} </p>
-    </html>
-  `;
-
-    return faturaHtml;
-}
-
 const faturas = JSON.parse(readFileSync('./faturas.json'));
-const faturaStr = gerarFaturaStr(faturas);
-const faturaHTML = gerarFaturaHTML(faturas);
+const faturaStr = gerarFaturaStr(faturas, calc);
+const faturaHTML = gerarFaturaHTML(faturas, calc);
 
 console.log(faturaStr);
 console.log(faturaHTML);
